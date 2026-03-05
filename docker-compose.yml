@@ -1,0 +1,44 @@
+services:
+  elbe-dev:
+    build:
+      context: ../..
+      dockerfile: tools/elbe-devcontainers/Dockerfile
+      args:
+        USERNAME: developer
+        USER_UID: ${HOST_UID:-1000}
+        USER_GID: ${HOST_GID:-1000}
+    container_name: elbe-dev
+    hostname: elbe-dev
+
+    # KVM needed for QEMU/initvm
+    privileged: true
+    devices:
+      - /dev/kvm:/dev/kvm
+
+    volumes:
+      # Mount the full workspace (toplevel) into /workspace
+      - ../..:/workspace
+      # Persistent initvm storage
+      - ../../.elbe/initvm:/workspace/.elbe/initvm
+
+    ports:
+      # ELBE initvm SOAP/XML-RPC communication port
+      - "7587:7587"
+      # ELBE UI web interface
+      - "8383:8080"
+
+    stdin_open: true
+    tty: true
+    restart: unless-stopped
+
+    networks:
+      - elbe-net
+
+networks:
+  elbe-net:
+    driver: bridge
+    ipam:
+      config:
+        # Use a subnet that does NOT conflict with corporate VPN routes
+        - subnet: 10.200.0.0/24
+          gateway: 10.200.0.1
