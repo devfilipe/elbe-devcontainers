@@ -13,8 +13,9 @@ DEFAULT_VM_DIR="$VMS_DIR/initvm"
 DEFAULT_SOAP_PORT=7587
 ELBE_LOG_DIR="/workspace/.elbe/logs"
 
+# Named volumes are mounted as root — fix ownership so developer can write
 mkdir -p "$VMS_DIR" "$ELBE_LOG_DIR"
-chown -R developer:developer /workspace/.elbe
+chown -R developer:developer "$VMS_DIR" "$ELBE_LOG_DIR"
 
 # ---------------------------------------------------------------------------
 # Default VM config file (tracks soap_port per VM)

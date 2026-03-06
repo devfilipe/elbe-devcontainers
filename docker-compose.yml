@@ -18,8 +18,10 @@ services:
     volumes:
       # Mount the full workspace (toplevel) into /workspace
       - ../..:/workspace
-      # Persistent initvm storage
-      - ../../.elbe/initvm:/workspace/.elbe/initvm
+      # Persistent VM and log data — survives docker compose down/up
+      # Use 'docker compose down -v' for a full reset
+      - elbe-vms:/workspace/.elbe/vms
+      - elbe-logs:/workspace/.elbe/logs
 
     ports:
       # ELBE initvm SOAP/XML-RPC communication port
@@ -33,6 +35,12 @@ services:
 
     networks:
       - elbe-net
+
+volumes:
+  elbe-vms:
+    name: elbe-vms
+  elbe-logs:
+    name: elbe-logs
 
 networks:
   elbe-net:
