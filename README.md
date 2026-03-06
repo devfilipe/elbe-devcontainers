@@ -21,8 +21,9 @@ Debian packaging tools for building custom Linux images.
 ```bash
 # 1. Clone the workspace (if not done yet)
 mkdir elbe-workspace && cd elbe-workspace
-repo init -u https://github.com/devfilipe/elbe-demo-manifest.git
+repo init -u git@github.com-devfilipe:devfilipe/elbe-demo-manifest.git
 repo sync
+repo start main --all
 
 # 2. Start the container
 cd tools/elbe-devcontainers
@@ -31,6 +32,14 @@ HOST_UID=$(id -u) HOST_GID=$(id -g) docker compose up -d
 # 3. Enter the container
 docker exec -it elbe-dev bash
 ```
+
+Once the container is running, the ELBE initvm and the ELBE UI start
+automatically. Access the web interface at:
+
+**<http://localhost:8383/spa/index.html>**
+
+From the UI you can manage the initvm, submit builds, handle APT repositories,
+and generate SBOMs — no shell required for day-to-day use.
 
 ## Create the initvm (one-time setup)
 
@@ -95,14 +104,41 @@ The container automatically starts the web interface
 ([`elbe-ui`](https://github.com/devfilipe/elbe-ui)) on port **8080**
 (mapped to **8383** on the host).
 
-Access it at: <http://localhost:8383>
+Access it at: <http://localhost:8383/spa/index.html>
+
+## Stopping and cleanup
+
+**Stop the container** (preserves the workspace volume and initvm state):
+
+```bash
+docker compose stop
+```
+
+**Restart after a stop:**
+
+```bash
+HOST_UID=$(id -u) HOST_GID=$(id -g) docker compose up -d
+```
+
+**Remove the container** (workspace volume is preserved):
+
+```bash
+docker compose down
+```
+
+**Full cleanup** (removes container, network, volumes, orphan containers, and
+built images — initvm and workspace data will be lost):
+
+```bash
+docker compose down --volumes --remove-orphans --rmi all
+```
 
 ## Exposed ports
 
 | Port (container) | Port (host) | Service |
 |---|---|---|
 | 7587 | 7587 | ELBE initvm SOAP/XML-RPC |
-| 8080 | 8383 | ELBE UI (web interface) |
+| 8080 | 8383 | ELBE UI — <http://localhost:8383/spa/index.html> |
 
 ## Workspace layout
 
